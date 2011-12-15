@@ -3,7 +3,16 @@ class jenkins {
   include jenkins::package
   include jenkins::service
 
-  Class["jenkins::repo"] -> Class["jenkins::package"] -> Class["jenkins::service"]
+  # JJM The anchor resources establish class containment
+  # to work around bug #8040
+  anchor { "jenkins::begin": }
+  anchor { "jenkins::end": }
+
+  Anchor["jenkins::begin"]
+  -> Class["jenkins::repo"]
+  -> Class["jenkins::package"]
+  -> Anchor["jenkins::end"]
+  -> Class["jenkins::service"]
 }
 
 class jenkins::git {
